@@ -28,10 +28,13 @@ function login(userName, password) {
   client = new SimpleClient('localhost', 1139);
 
   client.registerListener({
-    on_loginSuccess:   function(event, client) { showMessage("Now logged in!",     "#00aa00"); },
-    on_loginFailure:   function(event, client) { showMessage("Login failure!",     "#aa0000"); },
-    on_sessionMessage: function(event, client) { showMessage(event.sessionMessage, "#00aa00"); },
-    on_logout:         function(event, client) { showMessage("Logged out.",        "#00aa00"); },
+    on_loginSuccess:   function(event, client) { showMessage("Now logged in!",                           "#00aa00"); },
+    on_loginFailure:   function(event, client) { showMessage("Login failure!",                           "#aa0000"); },
+    on_logout:         function(event, client) { showMessage("Logged out.",                              "#00aa00"); },
+    on_sessionMessage: function(event, client) { showMessage(event.sessionMessage,                       "#00aa00"); },
+    on_channelMessage: function(event, client) { showChannelMessage(event.channelMessage, event.channel, "#00aa00"); },
+    on_channelJoin:    function(event, client) { justJoinedChannel(event.channel);                                   },
+    on_channelLeave:   function(event, client) { justLeftChannel  (event.channel);                                   },
   });
 
   client.login(userName || "guest-123", password || "");
@@ -40,11 +43,31 @@ function login(userName, password) {
 function logout() {
   client.logout();
   client = null;
+  clearChannelSelector();
+}
+
+function clearChannelSelector() {
+  var channelSelector = document.getElementById("channelSelector");
+  channelSelector.selectedIndex = 0;
+  for (var i = channelSelector.options.length - 1; i >= 1; --i) {
+    channelSelector.removeChild(channelSelector.options[i]);
+  }
 }
 
 function sendMessage(msg) {
-  showMessage(msg, "#0000aa");
-  client.sessionSend(msg);
+  var channelSelector = document.getElementById("channelSelector");
+  if (channelSelector.value == "_default_") {
+    client.sessionSend(msg);
+    showMessage(msg, "#0000aa");
+  } else {
+    var channel = client.getChannelWithID(parseInt(channelSelector.value));
+    client.channelSend(channel, msg);
+    showMessage("[" + channel + "]: " + msg, "#0000aa");
+  }
+}
+
+function showChannelMessage(msg, channel, color) {
+  showMessage("[" + channel + "]: " + msg, color);
 }
 
 function showMessage(msg, color) {
@@ -57,6 +80,22 @@ function showMessage(msg, color) {
   paragraph.style.color = color;
   document.getElementById('log').appendChild(paragraph);
   return msg;
+}
+
+function justJoinedChannel(channel) {
+  var channelSelector = document.getElementById("channelSelector");
+  var option = document.createElement("option");
+  option.value = channel.uniqueId();
+  option.appendChild(document.createTextNode(channel.name()));
+  channelSelector.appendChild(option);
+  showMessage("Joined channel " + channel, "#00aa00");
+}
+
+function justLeftChannel(channel) {
+  var channelSelector = document.getElementById("channelSelector");
+  var option = document.getElementById("channel_" + channel.uniqueId());
+  channelSelector.removeChild(option);
+  showMessage("Left channel " + channel, "#00aa00");
 }
 
 function doCommand() {
@@ -97,6 +136,10 @@ function doCommand() {
 <body>
 
 <h1>RedDwarf-JS client example</h1>
+
+<select id="channelSelector">
+  <option value="_default_">[session]</option>
+</select>
 
 <div id="log">
 </div>

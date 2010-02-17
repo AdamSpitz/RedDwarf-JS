@@ -99,19 +99,19 @@ BloodyHashTable.prototype.values = function values() {
 };
 
 BloodyHashTable.prototype.toString = function toString() {
-  var s = new StringBuffer("a BloodyHashTable");
+  if (this._size > 5) {return "a hash table";}
+  var s = ["a hash table"];
   var sep = "";
-  if (this._size > 5) {return s;}
-  s.append("(");
+  s.push("(");
   this._each(function(pair) {
-    s.append(sep).append(pair.key).append(": ").append(pair.value);
+    s.push(sep);
+    s.push(pair.key);
+    s.push(": ");
+    s.push(pair.value);
     sep = ", ";
   });
-  s.append(")");
-  return s.toString();
+  s.push(")");
+  return s.join("");
 };
 
 })();
-
-// For now we'll call it HashMap.
-HashMap = BloodyHashTable;

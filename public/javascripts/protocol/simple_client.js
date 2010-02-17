@@ -3,7 +3,7 @@ function SimpleClient(host, port) {
   this._port           = port;
   this._reconnectKey   = new ByteArray();
   this._eventListeners = [];
-  this._channels       = new HashMap();
+  this._channels       = new BloodyHashTable();
   this._sock           = new Orbited.TCPSocket();
   this._messageFilter  = new MessageFilter();
 
@@ -35,25 +35,27 @@ SimpleClient.prototype.login = function login(username, passwd) {
   this._sock.open(this._host, this._port, true); // must be in binary mode - otherwise we get Unicode weirdness -- Adam, Dec. 2009
 };
 
-SimpleClient.prototype.channelSend = function channelSend(channel /*ClientChannel*/, message /*ByteArray*/) {
+SimpleClient.prototype.channelSend = function channelSend(channel, message) {
   var buf = new ByteArray();
   buf.writeByte(SimpleSgsProtocol.CHANNEL_MESSAGE);
-  this.writeBytesPrecededByLength(channel.rawId, buf);
+  this.writeBytesPrecededByLength(channel.rawIdBytes(), buf);
   buf.writeBytes(message);
-  buf.position = 0;
   this.writeBytesPrecededByLength(buf, this._sock);
   this._sock.flush();
 };
 
 SimpleClient.prototype.getChannels = function getChannels() {
-  return this._channels.values();
+  return this._channels;
+};
+
+SimpleClient.prototype.getChannelWithID = function getChannelWithID(id) {
+  return this._channels.get(id);
 };
 
 SimpleClient.prototype.sessionSend = function sessionSend(message) {
   var buf = new ByteArray();
   buf.writeByte(SimpleSgsProtocol.SESSION_MESSAGE);
   buf.writeBytes(message);
-  //debug("SimpleClient.sessionSend(): about to write to the socket, readyState is now " + this._sock.readyState)
   this.writeBytesPrecededByLength(buf, this._sock);
   this._sock.flush();
 };
@@ -107,8 +109,6 @@ SimpleClient.prototype.registerListener = function registerListener(listener) {
  */
 /* private */ SimpleClient.prototype.receivedMessage = function receivedMessage(message) {
   var command = message.readByte();
-  var e = null;
-  var channel;
 
   if (command == SimpleSgsProtocol.LOGIN_SUCCESS)
   {
@@ -119,7 +119,7 @@ SimpleClient.prototype.registerListener = function registerListener(listener) {
 
   else if (command == SimpleSgsProtocol.LOGIN_FAILURE)
   {
-    e = new SgsEvent(SgsEvent.LOGIN_FAILURE);
+    var e = new SgsEvent(SgsEvent.LOGIN_FAILURE);
     e.failureMessage = message.readSgsString();
     this.dispatchSgsEvent(e);
   }
@@ -128,7 +128,7 @@ SimpleClient.prototype.registerListener = function registerListener(listener) {
   {
     var newHost = message.readSgsString();
     var newPort = message.readInt();
-    e = new SgsEvent(SgsEvent.LOGIN_REDIRECT);
+    var e = new SgsEvent(SgsEvent.LOGIN_REDIRECT);
     e.host = newHost;
     e.port = newPort;
     this.dispatchSgsEvent(e);
@@ -143,36 +143,36 @@ SimpleClient.prototype.registerListener = function registerListener(listener) {
 
   else if (command == SimpleSgsProtocol.RECONNECT_FAILURE)
   {
-    e = new SgsEvent(SgsEvent.RECONNECT_FAILURE);
+    var e = new SgsEvent(SgsEvent.RECONNECT_FAILURE);
     e.failureMessage = message.readSgsString();
     this.dispatchSgsEvent(e);
   }
 
   else if (command == SimpleSgsProtocol.SESSION_MESSAGE)
   {
-    e = new SgsEvent(SgsEvent.SESSION_MESSAGE);
+    var e = new SgsEvent(SgsEvent.SESSION_MESSAGE);
     e.sessionMessage = message.readRemainingBytes();
     this.dispatchSgsEvent(e);
   }
   else if (command == SimpleSgsProtocol.LOGOUT_SUCCESS)
   {
-    e = new SgsEvent(SgsEvent.LOGOUT);
+    var e = new SgsEvent(SgsEvent.LOGOUT);
     this.dispatchSgsEvent(e);
   }
   else if (command == SimpleSgsProtocol.CHANNEL_JOIN)
   {
     var channelName = message.readSgsString();
-    channel = new ClientChannel(channelName, message.readRemainingBytes());
-    this._channels.put(channel.id, channel);
-    e = new SgsEvent(SgsEvent.CHANNEL_JOIN);
+    var channel = new ClientChannel(channelName, message.readRemainingBytes());
+    this._channels.put(channel.uniqueId(), channel);
+    var e = new SgsEvent(SgsEvent.CHANNEL_JOIN);
     e.channel = channel;
     this.dispatchSgsEvent(e);
   }
   else if (command == SimpleSgsProtocol.CHANNEL_MESSAGE)
   {
     //Read channelId bytes
-    channel = this._channels.get(ClientChannel.bytesToChannelId(message.readSgsString()));
-    e = new SgsEvent(SgsEvent.CHANNEL_MESSAGE);
+    var channel = this._channels.get(ClientChannel.bytesToChannelId(message.readSgsString()));
+    var e = new SgsEvent(SgsEvent.CHANNEL_MESSAGE);
     e.channel = channel;
     e.channelMessage = message.readRemainingBytes();
     this.dispatchSgsEvent(e);
@@ -180,11 +180,11 @@ SimpleClient.prototype.registerListener = function registerListener(listener) {
   else if (command == SimpleSgsProtocol.CHANNEL_LEAVE)
   {
     //Read channelId bytes
-    channel = this._channels.get(ClientChannel.bytesToChannelId(message.readRemainingBytes()));
+    var channel = this._channels.get(ClientChannel.bytesToChannelId(message.readRemainingBytes()));
 
     if (channel != null) {
-      channels.remove(channel.id);
-      e = new SgsEvent(SgsEvent.CHANNEL_LEAVE);
+      this._channels.remove(channel.uniqueId());
+      var e = new SgsEvent(SgsEvent.CHANNEL_LEAVE);
       e.channel = channel;
       this.dispatchSgsEvent(e);
     }
