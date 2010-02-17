@@ -20,7 +20,7 @@ RedDwarf-JS is a Javascript client library for [RedDwarf](http://reddwarf.source
 
 ## Credits
 
-I hardly did anything. I basically just ported the [Darkstar-as3](http://code.google.com/p/darkstar-as3/) code over to Javascript.
+I hardly did anything. I basically just ported the [Darkstar-as3](http://code.google.com/p/darkstar-as3/) code over to Javascript. Thanks go to those guys, and the whole Project Darkstar/RedDwarf team. (Blame goes to me - I'm pretty sure I didn't port the code quite right.)
 
 
 ## Disclaimer
@@ -28,6 +28,6 @@ I hardly did anything. I basically just ported the [Darkstar-as3](http://code.go
 I don't know anything about RedDwarf, or about WebSockets or Orbited. I don't promise that this code will work for you. I haven't tried it out on different platforms. All I know is that it seems to work for me on my machine. Please let me know if you find bugs or would like to make a suggestion or a contribution.
 
 
-Technical stuff
+## Technical stuff
 
 In the long run, hopefully we'll be able to use some sort of official standardized WebSockets thing; for now, we're using [Orbited](http://orbited.org).
