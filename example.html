@@ -1,14 +1,16 @@
 <html>
 <head>
-<title>Orbited + RedDwarf-JS Example</title>
+<title>RedDwarf-JS Example</title>
+
 <script src="http://localhost:9000/static/Orbited.js"></script>
+
 <script>
-document.domain = document.domain;
-document.port   = document.port;
+document.domain           = document.domain;
+document.port             = document.port;
 Orbited.settings.hostname = 'localhost';
 Orbited.settings.port     = 9000;
-TCPSocket = Orbited.TCPSocket;
 </script>
+
 <script src="red_dwarf.js"></script>
 
 <script>
@@ -18,17 +20,35 @@ function login(userName, password) {
   client = new RedDwarf.SimpleClient('localhost', 1139);
 
   client.registerListener({
-    on_loginSuccess:   function(event, client) { showMessage("Now logged in!",                           "#00aa00"); },
-    on_loginFailure:   function(event, client) { showMessage("Login failure!",                           "#aa0000"); },
-    on_logout:         function(event, client) { showMessage("Logged out.",                              "#00aa00"); },
-    on_sessionMessage: function(event, client) { showMessage(event.sessionMessage,                       "#00aa00"); },
-    on_channelMessage: function(event, client) { showChannelMessage(event.channelMessage, event.channel, "#00aa00"); },
-    on_channelJoin:    function(event, client) { justJoinedChannel(event.channel);                                   },
-    on_channelLeave:   function(event, client) { justLeftChannel  (event.channel);                                   },
+    on_loginSuccess:   function(event, client) {       justLoggedIn(                              ); },
+    on_loginFailure:   function(event, client) {  justFailedToLogIn(                              ); },
+    on_logout:         function(event, client) {      justLoggedOut(                              ); },
+    on_sessionMessage: function(event, client) { showSessionMessage(                event.message ); },
+    on_channelMessage: function(event, client) { showChannelMessage( event.channel, event.message ); },
+    on_channelJoin:    function(event, client) {  justJoinedChannel( event.channel                ); },
+    on_channelLeave:   function(event, client) {    justLeftChannel( event.channel                ); },
   });
 
   client.login(userName || "guest-123", password || "");
 }
+
+/*
+The rest of this file is probably not that interesting. The main stuff you need to see
+is the call to registerListener (above) and this list of available methods:
+
+    client.login(username, password)
+    client.logout()
+    client.sessionSend(message)
+    client.channelSend(channel, message)
+    client.getChannelWithID(id)
+
+    channel.id()
+    channel.name()
+
+*/
+
+
+
 
 function logout() {
   client.logout();
@@ -56,9 +76,11 @@ function sendMessage(msg) {
   }
 }
 
-function showChannelMessage(msg, channel, color) {
-  showMessage("[" + channel + "]: " + msg, color);
-}
+function showSessionMessage(msg         ) { showMessage(msg,                         "#00aa00"); }
+function showChannelMessage(channel, msg) { showMessage("[" + channel + "]: " + msg, "#00aa00"); }
+function justLoggedIn()                   { showMessage("Logged in!",                "#00aa00"); }
+function justLoggedOut()                  { showMessage("Logged out.",               "#00aa00"); }
+function justFailedToLogIn()              { showMessage("Login failure!",            "#aa0000"); }
 
 function showMessage(msg, color) {
   var paragraph = document.createElement('p');
@@ -75,7 +97,7 @@ function showMessage(msg, color) {
 function justJoinedChannel(channel) {
   var channelSelector = document.getElementById("channelSelector");
   var option = document.createElement("option");
-  option.value = channel.uniqueId();
+  option.value = channel.id();
   option.appendChild(document.createTextNode(channel.name()));
   channelSelector.appendChild(option);
   showMessage("Joined channel " + channel, "#00aa00");
@@ -83,7 +105,7 @@ function justJoinedChannel(channel) {
 
 function justLeftChannel(channel) {
   var channelSelector = document.getElementById("channelSelector");
-  var option = document.getElementById("channel_" + channel.uniqueId());
+  var option = document.getElementById("channel_" + channel.id());
   channelSelector.removeChild(option);
   showMessage("Left channel " + channel, "#00aa00");
 }
@@ -138,7 +160,7 @@ function doCommand() {
   <input id="cmdBox">
 </form>
 
-<p>Available commands:</p>
+<p>Available commands for SwordWorld:</p>
 <ul>
   <li>login</li>
   <li>logout</li>
