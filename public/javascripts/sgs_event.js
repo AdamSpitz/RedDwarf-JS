@@ -1,21 +1,22 @@
-function SgsEvent(type) {
+(function() {
+
+RedDwarf.Event = function Event(type) {
   this._eventType = type;
   this.type = type;
-}
+};
 
-(function() {
-SgsEvent.prototype.eventType = function eventType() { return this._eventType; };
+RedDwarf.Event.prototype.eventType = function eventType() { return this._eventType; };
 
-SgsEvent.LOGIN_SUCCESS     = "loginSuccess";
-SgsEvent.LOGIN_FAILURE     = "loginFailure";
-SgsEvent.LOGIN_REDIRECT    = "loginRedirect";
-SgsEvent.RECONNECT_SUCCESS = "reconnectSuccess";
-SgsEvent.RECONNECT_FAILURE = "reconnectFailure";
-SgsEvent.SESSION_MESSAGE   = "sessionMessage";
-SgsEvent.LOGOUT            = "logout";
-SgsEvent.CHANNEL_JOIN      = "channelJoin";
-SgsEvent.CHANNEL_MESSAGE   = "channelMessage";
-SgsEvent.CHANNEL_LEAVE     = "channelLeave";
-SgsEvent.RAW_MESSAGE       = "rawMessage";
+RedDwarf.Event.LOGIN_SUCCESS     = "loginSuccess";
+RedDwarf.Event.LOGIN_FAILURE     = "loginFailure";
+RedDwarf.Event.LOGIN_REDIRECT    = "loginRedirect";
+RedDwarf.Event.RECONNECT_SUCCESS = "reconnectSuccess";
+RedDwarf.Event.RECONNECT_FAILURE = "reconnectFailure";
+RedDwarf.Event.SESSION_MESSAGE   = "sessionMessage";
+RedDwarf.Event.LOGOUT            = "logout";
+RedDwarf.Event.CHANNEL_JOIN      = "channelJoin";
+RedDwarf.Event.CHANNEL_MESSAGE   = "channelMessage";
+RedDwarf.Event.CHANNEL_LEAVE     = "channelLeave";
+RedDwarf.Event.RAW_MESSAGE       = "rawMessage";
 
 })();

@@ -1,4 +1,4 @@
-var SimpleSgsProtocol = {
+RedDwarf.SimpleProtocol = {
   MAX_MESSAGE_LENGTH: 65535,
   MAX_PAYLOAD_LENGTH: 65532,
   VERSION: 0x04,

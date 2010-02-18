@@ -1,8 +1,10 @@
-function MessageFilter() {
-  this._messageBuffer = new ByteArray();
-}
+(function() {
 
-MessageFilter.prototype.receive = function receive(msg, client) {
+RedDwarf.MessageFilter = function MessageFilter() {
+  this._messageBuffer = new RedDwarf.ByteArray();
+};
+
+RedDwarf.MessageFilter.prototype.receive = function receive(msg, client) {
   // Stuff any new bytes into the buffer
   this._messageBuffer.writeBytes(msg);
   this._messageBuffer.setPosition(0);
@@ -15,7 +17,7 @@ MessageFilter.prototype.receive = function receive(msg, client) {
     var payloadLength = this._messageBuffer.readShort();
 
     if (this._messageBuffer.bytesAvailable() >= payloadLength) {
-      var newMessage = new ByteArray();
+      var newMessage = new RedDwarf.ByteArray();
       this.onRawMessage(this._messageBuffer.readBytes(payloadLength));
     } else {
       // Roll back the length we read
@@ -24,10 +26,13 @@ MessageFilter.prototype.receive = function receive(msg, client) {
     }
   }
 
-  var newBuffer = new ByteArray(this._messageBuffer.readRemainingBytes());
+  var newBuffer = new RedDwarf.ByteArray(this._messageBuffer.readRemainingBytes());
   this._messageBuffer = newBuffer;
 }
 
-MessageFilter.prototype.onRawMessage = function onRawMessage(msg) {
+RedDwarf.MessageFilter.prototype.onRawMessage = function onRawMessage(msg) {
   // Overwrite this if you want.
 };
+
+
+})();

@@ -9,6 +9,7 @@ Orbited.settings.hostname = 'localhost';
 Orbited.settings.port     = 9000;
 TCPSocket = Orbited.TCPSocket;
 </script>
+<script src="javascripts/red_dwarf.js"></script>
 <script src="javascripts/hash_table.js"></script>
 <script src="javascripts/byte_array.js"></script>
 <script src="javascripts/tcp_socket_ext.js"></script>
@@ -22,7 +23,7 @@ TCPSocket = Orbited.TCPSocket;
 var client;
 
 function login(userName, password) {
-  client = new SimpleClient('localhost', 1139);
+  client = new RedDwarf.SimpleClient('localhost', 1139);
 
   client.registerListener({
     on_loginSuccess:   function(event, client) { showMessage("Now logged in!",                           "#00aa00"); },

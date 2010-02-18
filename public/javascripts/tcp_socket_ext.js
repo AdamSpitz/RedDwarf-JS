@@ -1,3 +1,5 @@
+(function() {
+
 Orbited.TCPSocket.prototype.writeByte = function writeByte(b) {
   this.writeBytes(String.fromCharCode(b));
 };
@@ -14,3 +16,5 @@ Orbited.TCPSocket.prototype.writeUTF = function writeUTF(str) {
 Orbited.TCPSocket.prototype.writeBytes = function(str) {
   this.send(str);
 };
+
+})();

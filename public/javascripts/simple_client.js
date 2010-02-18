@@ -1,31 +1,32 @@
-function SimpleClient(host, port) {
+(function() {
+
+RedDwarf.SimpleClient = function SimpleClient(host, port) {
   this._host           = host;
   this._port           = port;
-  this._reconnectKey   = new ByteArray();
+  this._reconnectKey   = new RedDwarf.ByteArray();
   this._eventListeners = [];
-  this._channels       = new BloodyHashTable();
+  this._channels       = new RedDwarf.BloodyHashTable();
   this._sock           = new Orbited.TCPSocket();
-  this._messageFilter  = new MessageFilter();
+  this._messageFilter  = new RedDwarf.MessageFilter();
 
   var thisClient = this;
   this._sock         .onread       = function(msg)  { return thisClient.onData(msg);       };
   this._sock         .onclose      = function(code) { return thisClient.onClose(code);     };
   this._messageFilter.onRawMessage = function(msg)  { return thisClient.onRawMessage(msg); };
-}
+};
 
-(function() {
-SimpleClient.prototype.writeBytesPrecededByLength = function writeBytesPrecededByLength(bytes, stream) {
+RedDwarf.SimpleClient.prototype.writeBytesPrecededByLength = function writeBytesPrecededByLength(bytes, stream) {
   var str = bytes.toString();
   stream.writeShort(str.length);
   stream.writeBytes(str);
 };
 
-SimpleClient.prototype.login = function login(username, passwd) {
+RedDwarf.SimpleClient.prototype.login = function login(username, passwd) {
   var thisClient = this;
   this._sock.onopen = function() {
-    var buf = new ByteArray();
-    buf.writeByte(SimpleSgsProtocol.LOGIN_REQUEST);
-    buf.writeByte(SimpleSgsProtocol.VERSION);
+    var buf = new RedDwarf.ByteArray();
+    buf.writeByte(RedDwarf.SimpleProtocol.LOGIN_REQUEST);
+    buf.writeByte(RedDwarf.SimpleProtocol.VERSION);
     buf.writeUTF(username);
     buf.writeUTF(passwd);
     thisClient.writeBytesPrecededByLength(buf, thisClient._sock);
@@ -34,54 +35,54 @@ SimpleClient.prototype.login = function login(username, passwd) {
   this._sock.open(this._host, this._port, true); // must be in binary mode - otherwise we get Unicode weirdness -- Adam, Dec. 2009
 };
 
-SimpleClient.prototype.channelSend = function channelSend(channel, message) {
-  var buf = new ByteArray();
-  buf.writeByte(SimpleSgsProtocol.CHANNEL_MESSAGE);
+RedDwarf.SimpleClient.prototype.channelSend = function channelSend(channel, message) {
+  var buf = new RedDwarf.ByteArray();
+  buf.writeByte(RedDwarf.SimpleProtocol.CHANNEL_MESSAGE);
   this.writeBytesPrecededByLength(channel.rawIdBytes(), buf);
   buf.writeBytes(message);
   this.writeBytesPrecededByLength(buf, this._sock);
 };
 
-SimpleClient.prototype.getChannels = function getChannels() {
+RedDwarf.SimpleClient.prototype.getChannels = function getChannels() {
   return this._channels;
 };
 
-SimpleClient.prototype.getChannelWithID = function getChannelWithID(id) {
+RedDwarf.SimpleClient.prototype.getChannelWithID = function getChannelWithID(id) {
   return this._channels.get(id);
 };
 
-SimpleClient.prototype.sessionSend = function sessionSend(message) {
-  var buf = new ByteArray();
-  buf.writeByte(SimpleSgsProtocol.SESSION_MESSAGE);
+RedDwarf.SimpleClient.prototype.sessionSend = function sessionSend(message) {
+  var buf = new RedDwarf.ByteArray();
+  buf.writeByte(RedDwarf.SimpleProtocol.SESSION_MESSAGE);
   buf.writeBytes(message);
   this.writeBytesPrecededByLength(buf, this._sock);
 };
 
-SimpleClient.prototype.logout = function logout(force) {
+RedDwarf.SimpleClient.prototype.logout = function logout(force) {
   if (force) {
     this._sock.close();
   } else {
-    var buf = new ByteArray();
-    buf.writeByte(SimpleSgsProtocol.LOGOUT_REQUEST);
+    var buf = new RedDwarf.ByteArray();
+    buf.writeByte(RedDwarf.SimpleProtocol.LOGOUT_REQUEST);
     this.writeBytesPrecededByLength(buf, this._sock);
   }
 };
 
 
-/* private */ SimpleClient.prototype.onClose = function onClose(code) {
+/* private */ RedDwarf.SimpleClient.prototype.onClose = function onClose(code) {
   // I'm confused. I saw something like this in the ActionScript code, but here it seems to mess things up.
-  // this.dispatchSgsEvent(new SgsEvent(SgsEvent.LOGOUT));
+  // this.dispatchRedDwarfEvent(new RedDwarf.Event(RedDwarf.Event.LOGOUT));
 };
 
-/* private */ SimpleClient.prototype.onData = function onData(msg) {
+/* private */ RedDwarf.SimpleClient.prototype.onData = function onData(msg) {
   this._messageFilter.receive(msg, this);
 };
 
-SimpleClient.prototype.onRawMessage = function onRawMessage(msg) {
-  this.receivedMessage(new ByteArray(msg));
+RedDwarf.SimpleClient.prototype.onRawMessage = function onRawMessage(msg) {
+  this.receivedMessage(new RedDwarf.ByteArray(msg));
 };
 
-SimpleClient.prototype.dispatchSgsEvent = function dispatchSgsEvent(e) {
+RedDwarf.SimpleClient.prototype.dispatchRedDwarfEvent = function dispatchRedDwarfEvent(e) {
   var listenerFunctionName = "on_" + e.eventType();
   for (var i = 0, n = this._eventListeners.length; i < n; ++i) {
     var listener = this._eventListeners[i];
@@ -90,7 +91,7 @@ SimpleClient.prototype.dispatchSgsEvent = function dispatchSgsEvent(e) {
   }
 };
 
-SimpleClient.prototype.registerListener = function registerListener(listener) {
+RedDwarf.SimpleClient.prototype.registerListener = function registerListener(listener) {
   this._eventListeners.push(listener);
 };
 
@@ -99,90 +100,90 @@ SimpleClient.prototype.registerListener = function registerListener(listener) {
 
 /**
  * This is the heart of the SimpleClient. The method reads
- * the incoming data, parses the commands based on the SimpleSgsProtocol byte
+ * the incoming data, parses the commands based on the RedDwarf.SimpleProtocol byte
  * and dispatches events.
  *
  */
-/* private */ SimpleClient.prototype.receivedMessage = function receivedMessage(message) {
+/* private */ RedDwarf.SimpleClient.prototype.receivedMessage = function receivedMessage(message) {
   var command = message.readByte();
 
-  if (command == SimpleSgsProtocol.LOGIN_SUCCESS)
+  if (command == RedDwarf.SimpleProtocol.LOGIN_SUCCESS)
   {
     //TODO reconnectkey support?
     var reconnectKey = message.readRemainingBytes();
-    this.dispatchSgsEvent(new SgsEvent(SgsEvent.LOGIN_SUCCESS));
+    this.dispatchRedDwarfEvent(new RedDwarf.Event(RedDwarf.Event.LOGIN_SUCCESS));
   }
 
-  else if (command == SimpleSgsProtocol.LOGIN_FAILURE)
+  else if (command == RedDwarf.SimpleProtocol.LOGIN_FAILURE)
   {
-    var e = new SgsEvent(SgsEvent.LOGIN_FAILURE);
+    var e = new RedDwarf.Event(RedDwarf.Event.LOGIN_FAILURE);
     e.failureMessage = message.readSgsString();
-    this.dispatchSgsEvent(e);
+    this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == SimpleSgsProtocol.LOGIN_REDIRECT)
+  else if (command == RedDwarf.SimpleProtocol.LOGIN_REDIRECT)
   {
     var newHost = message.readSgsString();
     var newPort = message.readInt();
-    var e = new SgsEvent(SgsEvent.LOGIN_REDIRECT);
+    var e = new RedDwarf.Event(RedDwarf.Event.LOGIN_REDIRECT);
     e.host = newHost;
     e.port = newPort;
-    this.dispatchSgsEvent(e);
+    this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == SimpleSgsProtocol.RECONNECT_SUCCESS)
+  else if (command == RedDwarf.SimpleProtocol.RECONNECT_SUCCESS)
   {
     //TODO reconnectkey support?
     var reconnectKey = message.readRemainingBytes();
-    this.dispatchSgsEvent(new SgsEvent(SgsEvent.RECONNECT_SUCCESS));
+    this.dispatchRedDwarfEvent(new RedDwarf.Event(RedDwarf.Event.RECONNECT_SUCCESS));
   }
 
-  else if (command == SimpleSgsProtocol.RECONNECT_FAILURE)
+  else if (command == RedDwarf.SimpleProtocol.RECONNECT_FAILURE)
   {
-    var e = new SgsEvent(SgsEvent.RECONNECT_FAILURE);
+    var e = new RedDwarf.Event(RedDwarf.Event.RECONNECT_FAILURE);
     e.failureMessage = message.readSgsString();
-    this.dispatchSgsEvent(e);
+    this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == SimpleSgsProtocol.SESSION_MESSAGE)
+  else if (command == RedDwarf.SimpleProtocol.SESSION_MESSAGE)
   {
-    var e = new SgsEvent(SgsEvent.SESSION_MESSAGE);
+    var e = new RedDwarf.Event(RedDwarf.Event.SESSION_MESSAGE);
     e.sessionMessage = message.readRemainingBytes();
-    this.dispatchSgsEvent(e);
+    this.dispatchRedDwarfEvent(e);
   }
-  else if (command == SimpleSgsProtocol.LOGOUT_SUCCESS)
+  else if (command == RedDwarf.SimpleProtocol.LOGOUT_SUCCESS)
   {
-    var e = new SgsEvent(SgsEvent.LOGOUT);
-    this.dispatchSgsEvent(e);
+    var e = new RedDwarf.Event(RedDwarf.Event.LOGOUT);
+    this.dispatchRedDwarfEvent(e);
   }
-  else if (command == SimpleSgsProtocol.CHANNEL_JOIN)
+  else if (command == RedDwarf.SimpleProtocol.CHANNEL_JOIN)
   {
     var channelName = message.readSgsString();
-    var channel = new ClientChannel(channelName, message.readRemainingBytes());
+    var channel = new RedDwarf.ClientChannel(channelName, message.readRemainingBytes());
     this._channels.put(channel.uniqueId(), channel);
-    var e = new SgsEvent(SgsEvent.CHANNEL_JOIN);
+    var e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_JOIN);
     e.channel = channel;
-    this.dispatchSgsEvent(e);
+    this.dispatchRedDwarfEvent(e);
   }
-  else if (command == SimpleSgsProtocol.CHANNEL_MESSAGE)
+  else if (command == RedDwarf.SimpleProtocol.CHANNEL_MESSAGE)
   {
     //Read channelId bytes
-    var channel = this._channels.get(ClientChannel.bytesToChannelId(message.readSgsString()));
-    var e = new SgsEvent(SgsEvent.CHANNEL_MESSAGE);
+    var channel = this._channels.get(RedDwarf.ClientChannel.bytesToChannelId(message.readSgsString()));
+    var e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_MESSAGE);
     e.channel = channel;
     e.channelMessage = message.readRemainingBytes();
-    this.dispatchSgsEvent(e);
+    this.dispatchRedDwarfEvent(e);
   }
-  else if (command == SimpleSgsProtocol.CHANNEL_LEAVE)
+  else if (command == RedDwarf.SimpleProtocol.CHANNEL_LEAVE)
   {
     //Read channelId bytes
-    var channel = this._channels.get(ClientChannel.bytesToChannelId(message.readRemainingBytes()));
+    var channel = this._channels.get(RedDwarf.ClientChannel.bytesToChannelId(message.readRemainingBytes()));
 
     if (channel != null) {
       this._channels.remove(channel.uniqueId());
-      var e = new SgsEvent(SgsEvent.CHANNEL_LEAVE);
+      var e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_LEAVE);
       e.channel = channel;
-      this.dispatchSgsEvent(e);
+      this.dispatchRedDwarfEvent(e);
     }
   }
   else
@@ -190,12 +191,5 @@ SimpleClient.prototype.registerListener = function registerListener(listener) {
     throw new Error("Undefined protocol command:" + command);
   }
 };
+
 })();
-
-
-
-function debug(msg) {
-  if (typeof(console) !== 'undefined') {
-    console.log(msg);
-  }
-}
