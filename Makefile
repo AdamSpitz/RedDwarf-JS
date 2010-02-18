@@ -1,6 +1,4 @@
-version_number := 0.1
-
-build_dir := RedDwarf-JS-$(version_number)
+build_dir := RedDwarf-JS
 
 js_files := $(addprefix src/, namespace.js hash_table.js byte_array.js tcp_socket_ext.js simple_sgs_protocol.js client_channel.js message_filter.js sgs_event.js simple_client.js)
 
