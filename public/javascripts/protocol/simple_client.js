@@ -29,7 +29,6 @@ SimpleClient.prototype.login = function login(username, passwd) {
     buf.writeUTF(username);
     buf.writeUTF(passwd);
     thisClient.writeBytesPrecededByLength(buf, thisClient._sock);
-    thisClient._sock.flush();
   };
 
   this._sock.open(this._host, this._port, true); // must be in binary mode - otherwise we get Unicode weirdness -- Adam, Dec. 2009
@@ -41,7 +40,6 @@ SimpleClient.prototype.channelSend = function channelSend(channel, message) {
   this.writeBytesPrecededByLength(channel.rawIdBytes(), buf);
   buf.writeBytes(message);
   this.writeBytesPrecededByLength(buf, this._sock);
-  this._sock.flush();
 };
 
 SimpleClient.prototype.getChannels = function getChannels() {
@@ -57,7 +55,6 @@ SimpleClient.prototype.sessionSend = function sessionSend(message) {
   buf.writeByte(SimpleSgsProtocol.SESSION_MESSAGE);
   buf.writeBytes(message);
   this.writeBytesPrecededByLength(buf, this._sock);
-  this._sock.flush();
 };
 
 SimpleClient.prototype.logout = function logout(force) {
@@ -67,7 +64,6 @@ SimpleClient.prototype.logout = function logout(force) {
     var buf = new ByteArray();
     buf.writeByte(SimpleSgsProtocol.LOGOUT_REQUEST);
     this.writeBytesPrecededByLength(buf, this._sock);
-    this._sock.flush();
   }
 };
 
