@@ -13,9 +13,9 @@ RedDwarf-JS is a Javascript client library for [RedDwarf](http://reddwarf.source
 
 ## Running the example client
 
-1. Get a command prompt in the reddwarf-js directory and then run `orbited`
+1. Get a command prompt in the RedDwarf-JS directory and then run `orbited`
 2. Get a command prompt in the directory where you downloaded RedDwarf Server and start it by running `java -jar bin/sgs-boot.jar tutorial/conf/SwordWorld.boot`
-3. Point your web browser at [http://localhost:9000/example](http://localhost:9000/example)
+3. Point your web browser at [http://localhost:9000/example/example.html](http://localhost:9000/example/example.html)
 
 
 ## Credits
