@@ -23,4 +23,9 @@ THE SOFTWARE.
 */
 
 // Let's try not to pollute the global namespace too much; we'll stick everything in RedDwarf.
-if (typeof(RedDwarf) === 'undefined') {RedDwarf = {};}
+if (typeof(RedDwarf) === 'undefined') {
+  RedDwarf = {
+    COPYRIGHT: 'Copyright (c) 2010 Adam Spitz',
+    LICENSE: 'This code is released under the MIT License: http://www.opensource.org/licenses/mit-license.php'
+  };
+}

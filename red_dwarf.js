@@ -1,5 +1,5 @@
 
-if(typeof(RedDwarf)==='undefined'){RedDwarf={};}
+if(typeof(RedDwarf)==='undefined'){RedDwarf={COPYRIGHT:'Copyright (c) 2010 Adam Spitz',LICENSE:'This code is released under the MIT License: http://www.opensource.org/licenses/mit-license.php'};}
 (function(){RedDwarf.extend=function extend(destination,source){for(var property in source){destination[property]=source[property];}
 if(source.toString!==Object.prototype.toString){destination.toString=source.toString;}
 return destination;};})();(function(){RedDwarf.BloodyHashTable=function(){this._buckets={};this._size=0;};RedDwarf.BloodyHashTable.Bucket=Array;RedDwarf.extend(RedDwarf.BloodyHashTable.prototype,{keysAreEqual:function(k1,k2){if(k1===null||k1===undefined){return k2===null||k2===undefined;}
