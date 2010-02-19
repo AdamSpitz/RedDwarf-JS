@@ -1,6 +1,6 @@
 build_dir := RedDwarf-JS
 
-js_files := $(addprefix src/, namespace.js hash_table.js byte_array.js tcp_socket_ext.js simple_sgs_protocol.js client_channel.js message_filter.js sgs_event.js simple_client.js)
+js_files := $(addprefix src/, namespace.js object_system.js hash_table.js byte_array.js tcp_socket_ext.js simple_sgs_protocol.js client_channel.js message_filter.js sgs_event.js simple_client.js)
 
 minified_js_file := red_dwarf.js
 unminified_js_file := red_dwarf_readable.js

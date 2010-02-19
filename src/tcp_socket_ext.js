@@ -24,21 +24,23 @@ THE SOFTWARE.
 
 (function() {
 
-Orbited.TCPSocket.prototype.writeByte = function writeByte(b) {
-  this.writeBytes(String.fromCharCode(b));
-};
+RedDwarf.extend(Orbited.TCPSocket.prototype, {
+  writeByte: function(b) {
+    this.writeBytes(String.fromCharCode(b));
+  },
 
-Orbited.TCPSocket.prototype.writeShort = function writeShort(s) {
-  this.writeBytes(String.fromCharCode((s >> 8) & 255, s & 255));
-};
+  writeShort: function(s) {
+    this.writeBytes(String.fromCharCode((s >> 8) & 255, s & 255));
+  },
 
-Orbited.TCPSocket.prototype.writeUTF = function writeUTF(str) {
-  this.writeShort(str.length);
-  this.writeBytes(str);
-};
+  writeUTF: function(str) {
+    this.writeShort(str.length);
+    this.writeBytes(str);
+  },
 
-Orbited.TCPSocket.prototype.writeBytes = function(str) {
-  this.send(str);
-};
+  writeBytes: function(str) {
+    this.send(str);
+  }
+});
 
 })();

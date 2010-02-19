@@ -22,31 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// I don't really want to use a whole big library like Prototype, but it does
+// seem like Javascript needs a little bit of this kind of stuff to make it
+// livable.
+
 (function() {
 
-RedDwarf.ClientChannel = function(name, rawId) {
-  this._name = name;
-  this._rawIdBytes = rawId;
-  this._idNumber = RedDwarf.ClientChannel.bytesToChannelId(rawId);
-};
-
-RedDwarf.extend(RedDwarf.ClientChannel.prototype, {
-  name      : function() { return this._name;       },
-  id        : function() { return this._idNumber;   },
-  uniqueId  : function() { return this._idNumber;   },
-  rawIdBytes: function() { return this._rawIdBytes; },
-  toString  : function() { return this._name;       }
-});
-
-RedDwarf.ClientChannel.bytesToChannelId = function(buf) {
-  var result = 0;
-  var shift = (buf.length - 1) * 8;
-  for (var i = 0, n = buf.length; i < n; ++i) {
-    var b = buf.charCodeAt(i);
-    result += (b & 255) << shift;
-    shift -= 8;
+RedDwarf.extend = function extend(destination, source) {
+  for (var property in source) {
+    destination[property] = source[property];
   }
-  return result;
+  return destination;
 };
 
 })();

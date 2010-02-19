@@ -26,21 +26,24 @@ THE SOFTWARE.
 
 RedDwarf.Event = function Event(type) {
   this._eventType = type;
-  this.type = type;
 };
 
-RedDwarf.Event.prototype.eventType = function eventType() { return this._eventType; };
+RedDwarf.extend(RedDwarf.Event.prototype, {
+  eventType: function() { return this._eventType; }
+});
 
-RedDwarf.Event.LOGIN_SUCCESS     = "loginSuccess";
-RedDwarf.Event.LOGIN_FAILURE     = "loginFailure";
-RedDwarf.Event.LOGIN_REDIRECT    = "loginRedirect";
-RedDwarf.Event.RECONNECT_SUCCESS = "reconnectSuccess";
-RedDwarf.Event.RECONNECT_FAILURE = "reconnectFailure";
-RedDwarf.Event.SESSION_MESSAGE   = "sessionMessage";
-RedDwarf.Event.LOGOUT            = "logout";
-RedDwarf.Event.CHANNEL_JOIN      = "channelJoin";
-RedDwarf.Event.CHANNEL_MESSAGE   = "channelMessage";
-RedDwarf.Event.CHANNEL_LEAVE     = "channelLeave";
-RedDwarf.Event.RAW_MESSAGE       = "rawMessage";
+RedDwarf.extend(RedDwarf.Event, {
+  LOGIN_SUCCESS    : "loginSuccess",
+  LOGIN_FAILURE    : "loginFailure",
+  LOGIN_REDIRECT   : "loginRedirect",
+  RECONNECT_SUCCESS: "reconnectSuccess",
+  RECONNECT_FAILURE: "reconnectFailure",
+  SESSION_MESSAGE  : "sessionMessage",
+  LOGOUT           : "logout",
+  CHANNEL_JOIN     : "channelJoin",
+  CHANNEL_MESSAGE  : "channelMessage",
+  CHANNEL_LEAVE    : "channelLeave",
+  RAW_MESSAGE      : "rawMessage"
+});
 
 })();
