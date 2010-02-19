@@ -32,6 +32,13 @@ RedDwarf.extend = function extend(destination, source) {
   for (var property in source) {
     destination[property] = source[property];
   }
+
+  // Weird hack needed because for some idiotic reason "for" doesn't yield
+  // any property called "toString" in IE.
+  if (source.toString !== Object.prototype.toString) {
+    destination.toString = source.toString;
+  }
+
   return destination;
 };
 
