@@ -41,7 +41,6 @@ RedDwarf.MessageFilter.prototype.receive = function receive(msg, client) {
     var payloadLength = this._messageBuffer.readShort();
 
     if (this._messageBuffer.bytesAvailable() >= payloadLength) {
-      var newMessage = new RedDwarf.ByteArray();
       this.onRawMessage(this._messageBuffer.readBytes(payloadLength));
     } else {
       // Roll back the length we read

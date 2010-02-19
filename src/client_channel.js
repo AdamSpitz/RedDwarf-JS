@@ -28,7 +28,7 @@ RedDwarf.ClientChannel = function ClientChannel(name, rawId) {
   this._name = name;
   this._rawIdBytes = rawId;
   this._idNumber = RedDwarf.ClientChannel.bytesToChannelId(rawId);
-}
+};
 
 RedDwarf.ClientChannel.prototype.name       = function name      () { return this._name;       };
 RedDwarf.ClientChannel.prototype.id         = function id        () { return this._idNumber;   };

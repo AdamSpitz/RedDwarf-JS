@@ -50,7 +50,7 @@ RedDwarf.ByteArray.prototype.writeBytes = function writeBytes(str) {
 };
 
 RedDwarf.ByteArray.prototype.toString = function toString() {
-  if (this._cachedString == null) {
+  if (! this._cachedString) {
     this._cachedString = this._strings.join("");
   }
   return this._cachedString;

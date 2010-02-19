@@ -115,7 +115,7 @@ RedDwarf.SimpleClient.prototype.getChannelWithID = function getChannelWithID(id)
   for (var i = 0, n = this._eventListeners.length; i < n; ++i) {
     var listener = this._eventListeners[i];
     var listenerFunction = listener[listenerFunctionName];
-    if (listenerFunction != null) {listenerFunction.call(listener, e, this);}
+    if (listenerFunction) {listenerFunction.call(listener, e, this);}
   }
 };
 
@@ -126,86 +126,87 @@ RedDwarf.SimpleClient.prototype.getChannelWithID = function getChannelWithID(id)
  */
 /* private */ RedDwarf.SimpleClient.prototype.receivedMessage = function receivedMessage(message) {
   var command = message.readByte();
+  var e, channel;
 
-  if (command == RedDwarf.SimpleProtocol.LOGIN_SUCCESS)
+  if (command === RedDwarf.SimpleProtocol.LOGIN_SUCCESS)
   {
     //TODO reconnectkey support?
-    var e = new RedDwarf.Event(RedDwarf.Event.LOGIN_SUCCESS);
+    e = new RedDwarf.Event(RedDwarf.Event.LOGIN_SUCCESS);
     e.reconnectKey = message.readRemainingBytes();
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.LOGIN_FAILURE)
+  else if (command === RedDwarf.SimpleProtocol.LOGIN_FAILURE)
   {
-    var e = new RedDwarf.Event(RedDwarf.Event.LOGIN_FAILURE);
+    e = new RedDwarf.Event(RedDwarf.Event.LOGIN_FAILURE);
     e.failureMessage = message.readSgsString();
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.LOGIN_REDIRECT)
+  else if (command === RedDwarf.SimpleProtocol.LOGIN_REDIRECT)
   {
     var newHost = message.readSgsString();
     var newPort = message.readInt();
-    var e = new RedDwarf.Event(RedDwarf.Event.LOGIN_REDIRECT);
+    e = new RedDwarf.Event(RedDwarf.Event.LOGIN_REDIRECT);
     e.host = newHost;
     e.port = newPort;
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.RECONNECT_SUCCESS)
+  else if (command === RedDwarf.SimpleProtocol.RECONNECT_SUCCESS)
   {
     //TODO reconnectkey support?
-    var e = new RedDwarf.Event(RedDwarf.Event.RECONNECT_SUCCESS);
+    e = new RedDwarf.Event(RedDwarf.Event.RECONNECT_SUCCESS);
     e.reconnectKey = message.readRemainingBytes();
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.RECONNECT_FAILURE)
+  else if (command === RedDwarf.SimpleProtocol.RECONNECT_FAILURE)
   {
-    var e = new RedDwarf.Event(RedDwarf.Event.RECONNECT_FAILURE);
+    e = new RedDwarf.Event(RedDwarf.Event.RECONNECT_FAILURE);
     e.failureMessage = message.readSgsString();
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.SESSION_MESSAGE)
+  else if (command === RedDwarf.SimpleProtocol.SESSION_MESSAGE)
   {
-    var e = new RedDwarf.Event(RedDwarf.Event.SESSION_MESSAGE);
+    e = new RedDwarf.Event(RedDwarf.Event.SESSION_MESSAGE);
     e.message = message.readRemainingBytes();
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.LOGOUT_SUCCESS)
+  else if (command === RedDwarf.SimpleProtocol.LOGOUT_SUCCESS)
   {
-    var e = new RedDwarf.Event(RedDwarf.Event.LOGOUT);
+    e = new RedDwarf.Event(RedDwarf.Event.LOGOUT);
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.CHANNEL_JOIN)
+  else if (command === RedDwarf.SimpleProtocol.CHANNEL_JOIN)
   {
     var channelName = message.readSgsString();
-    var channel = new RedDwarf.ClientChannel(channelName, message.readRemainingBytes());
+    channel = new RedDwarf.ClientChannel(channelName, message.readRemainingBytes());
     this._channels.put(channel.uniqueId(), channel);
-    var e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_JOIN);
+    e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_JOIN);
     e.channel = channel;
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.CHANNEL_MESSAGE)
+  else if (command === RedDwarf.SimpleProtocol.CHANNEL_MESSAGE)
   {
-    var channel = this._channels.get(RedDwarf.ClientChannel.bytesToChannelId(message.readSgsString()));
-    var e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_MESSAGE);
+    channel = this._channels.get(RedDwarf.ClientChannel.bytesToChannelId(message.readSgsString()));
+    e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_MESSAGE);
     e.channel = channel;
     e.message = message.readRemainingBytes();
     this.dispatchRedDwarfEvent(e);
   }
 
-  else if (command == RedDwarf.SimpleProtocol.CHANNEL_LEAVE)
+  else if (command === RedDwarf.SimpleProtocol.CHANNEL_LEAVE)
   {
-    var channel = this._channels.get(RedDwarf.ClientChannel.bytesToChannelId(message.readRemainingBytes()));
+    channel = this._channels.get(RedDwarf.ClientChannel.bytesToChannelId(message.readRemainingBytes()));
 
-    if (channel != null) {
+    if (channel) {
       this._channels.remove(channel.uniqueId());
-      var e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_LEAVE);
+      e = new RedDwarf.Event(RedDwarf.Event.CHANNEL_LEAVE);
       e.channel = channel;
       this.dispatchRedDwarfEvent(e);
     }
