@@ -24,7 +24,7 @@ This is just a port of the [Darkstar-as3](http://code.google.com/p/darkstar-as3/
 
 ## Disclaimer
 
-I can't promise that this code will work for you. I've tried it out with HelloChannels and SwordWorld, on a few different browsers (Safari and Firefox and Chrome on my Macbook, and IE8 and Chrome on Windows XP). Please [let me know](adam.spitz@gmail.com) if you find bugs or have questions or comments.
+I can't promise that this code will work for you. I've tried it out with HelloChannels and SwordWorld, on a few different browsers (Safari and Firefox and Chrome on my Macbook, and IE8 and Chrome on Windows XP). Please [let me know](mailto:adam.spitz@gmail.com) if you find bugs or have questions or comments.
 
 
 ## License
