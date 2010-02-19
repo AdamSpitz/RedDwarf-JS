@@ -46,8 +46,7 @@ Number.prototype.equals = function equals(other) {
   return this == other;
 };
 
-RedDwarf.BloodyHashTable.Bucket = function() {}
-RedDwarf.BloodyHashTable.Bucket.prototype = [];
+RedDwarf.BloodyHashTable.Bucket = Array;
 
 RedDwarf.BloodyHashTable.prototype.keysAreEqual = function keysAreEqual(k1, k2) {
   if (k1 == null) {return k2 == null;}

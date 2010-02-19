@@ -2,12 +2,12 @@
 <head>
 <title>RedDwarf-JS Example</title>
 
-<script src="http://localhost:9000/static/Orbited.js"></script>
+<script src="/static/Orbited.js"></script>
 
 <script>
 document.domain           = document.domain;
 document.port             = document.port;
-Orbited.settings.hostname = 'localhost';
+Orbited.settings.hostname = '192.168.2.22';
 Orbited.settings.port     = 9000;
 </script>
 
@@ -26,7 +26,7 @@ function login(userName, password) {
     on_sessionMessage: function(event, client) { showSessionMessage(                event.message ); },
     on_channelMessage: function(event, client) { showChannelMessage( event.channel, event.message ); },
     on_channelJoin:    function(event, client) {  justJoinedChannel( event.channel                ); },
-    on_channelLeave:   function(event, client) {    justLeftChannel( event.channel                ); },
+    on_channelLeave:   function(event, client) {    justLeftChannel( event.channel                ); }
   });
 
   client.login(userName || "guest-123", password || "");

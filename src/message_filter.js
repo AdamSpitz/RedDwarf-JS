@@ -52,7 +52,7 @@ RedDwarf.MessageFilter.prototype.receive = function receive(msg, client) {
 
   var newBuffer = new RedDwarf.ByteArray(this._messageBuffer.readRemainingBytes());
   this._messageBuffer = newBuffer;
-}
+};
 
 RedDwarf.MessageFilter.prototype.onRawMessage = function onRawMessage(msg) {
   // Overwrite this if you want.
