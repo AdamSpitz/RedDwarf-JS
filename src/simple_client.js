@@ -31,12 +31,11 @@ RedDwarf.SimpleClient = function SimpleClient(host, port) {
   this._eventListeners = [];
   this._channels       = new RedDwarf.BloodyHashTable();
   this._sock           = new Orbited.TCPSocket();
-  this._messageFilter  = new RedDwarf.MessageFilter();
+  this._messageFilter  = new RedDwarf.MessageFilter(this);
 
   var thisClient = this;
-  this._sock         .onread       = function(msg)  { return thisClient.onData(msg);       };
-  this._sock         .onclose      = function(code) { return thisClient.onClose(code);     };
-  this._messageFilter.onRawMessage = function(msg)  { return thisClient.onRawMessage(msg); };
+  this._sock.onread  = function(msg)  { return thisClient.onData(msg);       };
+  this._sock.onclose = function(code) { return thisClient.onClose(code);     };
 };
 
 RedDwarf.extend(RedDwarf.SimpleClient.prototype, {
@@ -105,10 +104,6 @@ RedDwarf.extend(RedDwarf.SimpleClient.prototype, {
     this._messageFilter.receive(msg, this);
   },
 
-  /* private */ onRawMessage: function(msg) {
-    this.receivedMessage(new RedDwarf.ByteArray(msg));
-  },
-
   // aaa
   /* private */ dispatchRedDwarfEvent: function(e) {
     var listenerFunctionName = "on_" + e.eventType();
@@ -124,7 +119,8 @@ RedDwarf.extend(RedDwarf.SimpleClient.prototype, {
    * data, parses the commands based on the RedDwarf.SimpleProtocol byte
    * and dispatches events.
    */
-  /* private */   receivedMessage: function(message) {
+  /* private */ onRawMessage: function(messageString) {
+    var message = new RedDwarf.ByteArray(messageString);
     var command = message.readByte();
     var e;
     var channel;

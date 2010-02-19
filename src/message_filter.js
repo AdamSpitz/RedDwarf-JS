@@ -24,7 +24,8 @@ THE SOFTWARE.
 
 (function() {
 
-RedDwarf.MessageFilter = function() {
+RedDwarf.MessageFilter = function(client) {
+  this._client = client;
   this._messageBuffer = new RedDwarf.ByteArray();
 };
 
@@ -42,7 +43,7 @@ RedDwarf.extend(RedDwarf.MessageFilter.prototype, {
       var payloadLength = this._messageBuffer.readShort();
   
       if (this._messageBuffer.bytesAvailable() >= payloadLength) {
-        this.onRawMessage(this._messageBuffer.readBytes(payloadLength));
+        client.onRawMessage(this._messageBuffer.readBytes(payloadLength));
       } else {
         // Roll back the length we read
         this._messageBuffer.setPosition(this._messageBuffer.position() - 2);
@@ -52,11 +53,8 @@ RedDwarf.extend(RedDwarf.MessageFilter.prototype, {
   
     var newBuffer = new RedDwarf.ByteArray(this._messageBuffer.readRemainingBytes());
     this._messageBuffer = newBuffer;
-  },
-
-  onRawMessage: function(msg) {
-    // expected to be overwritten
   }
+
 });
 
 })();
