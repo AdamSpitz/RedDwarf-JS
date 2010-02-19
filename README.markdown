@@ -24,7 +24,7 @@ This is just a port of the [Darkstar-as3](http://code.google.com/p/darkstar-as3/
 
 ## Disclaimer
 
-I don't know much about RedDwarf, or about WebSockets or Orbited. I don't promise that this code will work for you. I've tried it out with the HelloChannels and SwordWorld projects, on a few different browsers (Safari and Firefox and Chrome on my Macbook, and IE8 and Chrome on Windows XP). Please let me know if you find bugs or would like to make a suggestion or a contribution.
+I can't promise that this code will work for you. I've tried it out with the HelloChannels and SwordWorld projects, on a few different browsers (Safari and Firefox and Chrome on my Macbook, and IE8 and Chrome on Windows XP). Please let me know if you find bugs or would like to make a suggestion or a contribution.
 
 
 ## License

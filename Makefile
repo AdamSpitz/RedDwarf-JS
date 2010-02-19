@@ -1,26 +1,26 @@
-build_dir := RedDwarf-JS-0.1
+build_dir := RedDwarf-JS
 
 js_files := $(addprefix src/, namespace.js hash_table.js byte_array.js tcp_socket_ext.js simple_sgs_protocol.js client_channel.js message_filter.js sgs_event.js simple_client.js)
 
-minified_js_file := $(build_dir)/red_dwarf.js
+minified_js_file := red_dwarf.js
 
 zip_file := $(build_dir).zip
 
-other_files := example.html orbited.cfg README.markdown LICENSE.txt
+files_to_release := example.html orbited.cfg README.markdown LICENSE.txt $(minified_js_file)
 
-all: dist
+$(minified_js_file): $(js_files)
+	cat $(js_files) | jsmin > $(minified_js_file)
 
 $(build_dir):
 	mkdir $(build_dir)
 
-$(minified_js_file): $(js_files) $(build_dir)
-	cat $(js_files) | jsmin > $(minified_js_file)
-
-$(zip_file): $(build_dir) $(minified_js_file) $(other_files)
-	cp  $(other_files) $(build_dir)
+$(zip_file): $(build_dir) $(files_to_release)
+	cp  $(files_to_release) $(build_dir)
 	zip -r $(zip_file) $(build_dir)
 
 clean:
-	rm -r $(build_dir) $(zip_file)
+	rm -r $(build_dir) $(zip_file) $(minified_js_file)
 
 dist: $(zip_file)
+
+all: dist
