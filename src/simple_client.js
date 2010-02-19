@@ -104,7 +104,6 @@ RedDwarf.extend(RedDwarf.SimpleClient.prototype, {
     this._messageFilter.receive(msg, this);
   },
 
-  // aaa
   /* private */ dispatchRedDwarfEvent: function(e) {
     var listenerFunctionName = "on_" + e.eventType();
     for (var i = 0, n = this._eventListeners.length; i < n; ++i) {

@@ -38,7 +38,7 @@ RedDwarf.BloodyHashTable = function() {
 
 // I'd prefer to use a subclass of Array, but that gave me grief on IE.
 // Maybe there's a way to do it; try later.
-RedDwarf.BloodyHashTable.Bucket = Array, 
+RedDwarf.BloodyHashTable.Bucket = Array;
 
 RedDwarf.extend(RedDwarf.BloodyHashTable.prototype, {
 
