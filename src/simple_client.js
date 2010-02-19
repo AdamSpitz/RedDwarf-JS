@@ -126,7 +126,8 @@ RedDwarf.SimpleClient.prototype.getChannelWithID = function getChannelWithID(id)
  */
 /* private */ RedDwarf.SimpleClient.prototype.receivedMessage = function receivedMessage(message) {
   var command = message.readByte();
-  var e, channel;
+  var e;
+  var channel;
 
   if (command === RedDwarf.SimpleProtocol.LOGIN_SUCCESS)
   {

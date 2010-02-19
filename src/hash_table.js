@@ -38,12 +38,12 @@ RedDwarf.BloodyHashTable = function BloodyHashTable() {
 
 /* Adding stuff to Object.prototype screws up Ajax. See http://dev.rubyonrails.org/ticket/6579
 Object.prototype.equals = function equals(other) {
-  return this === other;
+  return this == other;
 };
 */
 
 Number.prototype.equals = function equals(other) {
-  return this === other;
+  return this == other;
 };
 
 RedDwarf.BloodyHashTable.Bucket = Array;
